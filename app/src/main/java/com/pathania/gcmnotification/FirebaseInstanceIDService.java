@@ -6,7 +6,9 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import java.io.IOException;
@@ -20,6 +22,8 @@ import okhttp3.RequestBody;
 /**
  * Created by Malhotra G on 6/25/2016.
  */
+
+
 public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     @Override
@@ -36,7 +40,7 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
         //Log.e("token" , token);
 
         try {
-            AsyncHttpClient client = new AsyncHttpClient();
+            SyncHttpClient client = new SyncHttpClient();
             /*
             * Bind parameters here
             * */
@@ -48,19 +52,17 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
             } catch (Exception e) {
                 Log.e("catch1" , e.toString());
             }
-            client.post("http://wepool.roms4all.com/register_fcm.php", params, new TextHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String res) {
-                            Log.e("res: ",res);
-                        }
+            client.post(this, "http://indianroute.roms4all.com/register_fcm.php", params, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
 
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String res, Throwable t) {
-                            // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                            Log.e("fail" , res);
-                        }
-                    }
-            );
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    Log.e("success", responseString);
+                }
+            });
         } catch (Exception e) {
             Log.e("catch2" , e.toString());
         }
